@@ -1,5 +1,4 @@
 <?php
-require_once("myform.php");
 
 class block_exacsvenrol extends block_base
 {
@@ -10,27 +9,27 @@ class block_exacsvenrol extends block_base
 
     public function get_content()
     {
+        global $CFG;
+
         if ($this->content !== null) {
             return $this->content;
         }
+        $content = '';
 
-        $mform = new simplehtml_form();
+        $icon = '<img src="' . $CFG->wwwroot . '/blocks/exacsvenrol/icons/user-solid.svg' . '" class="icon" alt="" />';
+        $content .= $icon . '<a href="/blocks/exacsvenrol/import.php">Upload Users</a>';
 
-
-        if (($data = $mform->get_data())) {
-            die();
-        } else {
-            $this->content->text = $mform->render();
-        }
+        $this->content = new stdClass();
+        $this->content->text = $content;
         return $this->content;
     }
 
     public function readCSV()
     {
-        global $DB;
+        global $CFG, $DB;
 
-        $myfile = fopen("C:\Users\wolfg\Documents\moodle\server\moodle\blocks\\exacsvenrol\\user.csv", "r");
-        $value = fread($myfile, filesize("C:\Users\wolfg\Documents\moodle\server\moodle\blocks\\exacsvenrol\\user.csv"));
+        $myfile = fopen( $CFG->fileroot . "\\blocks\\exacsvenrol\\user.csv", "r");
+        $value = fread($myfile, filesize($CFG->fileroot . "\\blocks\\exacsvenrol\\user.csv"));
         fclose($myfile);
 
         $users = explode("\n", $value);
