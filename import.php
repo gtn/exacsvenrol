@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-global $ADMIN, $CFG, $DB, $PAGE;
+global $ADMIN, $CFG, $DB, $PAGE, $OUTPUT;
 
 use context_system;
 use moodle_url;
@@ -24,13 +24,15 @@ require_once($CFG->libdir . '/adminlib.php');
 
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url(new moodle_url('/blocks/exacsvenrol/import.php'));
-$PAGE->set_title("Import Title");
-$PAGE->set_heading("Import Heading");
+$PAGE->set_title("Exacsvenrol");
+$PAGE->set_heading("Exacsvenrol");
 $PAGE->set_pagelayout('mydashboard');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     createUser();
 }
+
+echo $OUTPUT->header();
 
 function createUser(){
     global $CFG, $DB;
@@ -110,8 +112,6 @@ function enrolUser($userid, $role, $courseid)
 }
 
 ?>
-<h1>EXACSVENROL</h1>
-
 <form method="post" enctype="multipart/form-data">
     <label>Please select your CSV-File (*.csv)!
     </label>
@@ -120,3 +120,7 @@ function enrolUser($userid, $role, $courseid)
     <br/><br/>
     <input type="submit" value="Upload CSV!">
 </form>
+
+<?php
+    echo $OUTPUT->footer();
+?>
