@@ -24,8 +24,8 @@ require_once($CFG->libdir . '/adminlib.php');
 
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url(new moodle_url('/blocks/exacsvenrol/import.php'));
-$PAGE->set_title("Exacsvenrol");
-$PAGE->set_heading("Exacsvenrol");
+$PAGE->set_title(get_string("pluginname", "block_exacsvenrol"));
+$PAGE->set_heading(get_string("pluginname", "block_exacsvenrol"));
 $PAGE->set_pagelayout('mydashboard');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -47,29 +47,63 @@ function createUser(){
                 fclose($myfile);
 
                 $users = explode("\n", $value);
+                $userList = array();
+                $counter = 0;
+                $errorCounter = 0;
+                $enrollCounter = 0;
 
                 foreach (array_filter($users) as $u) {
                     $u = explode(",", $u);
-                    if (($DB->get_record('user', ['username' => $u[0]])) !== null) {
-                        $user = create_user_record($u[0], $u[4]);
+                    if (($DB->get_record('user', ['username' => $u[0]])) == null) {
+                        $user = create_user_record($u[0], "sicheresPasswort123!");
                         $user->firstname = $u[1];
                         $user->lastname = $u[2];
                         $user->email = $u[3];
 
                         $DB->update_record('user', $user);
 
-                        $user = $DB->get_record('user', ['username' => $u[0]]);
-                        $course = $DB->get_record('course', ['fullname' => $u[6]]);
-                        enrolUser($user->id, strtolower($u[5]), $course->id);
+                        $counter++;
+                    } else {
+                        $userList[] = $u[0];
+                        $errorCounter++;
+                    }
+                    $user = $DB->get_record('user', ['username' => $u[0]]);
+                    $course = $DB->get_record('course', ['shortname' => $u[5]]);
+                    $context = context_course::instance($course->id);
+
+                    if(!is_enrolled($context, $user)){
+                        enrolUser($user->id, strtolower($u[4]), $course->id);
+                        $enrollCounter++;
                     }
                 }
-                echo "Users were created successfully!";
             } catch (Exception $e) {
-                echo $e;
+                $msg = $e->getMessage();
+                echo "<script>alert('$msg')</script>";
+            } finally {
+                if($counter > 0){
+                    if($counter > 1){
+                        $msg = get_string('usersCreated', 'block_exacsvenrol', $counter);
+                    } else {
+                        $msg = get_string('userCreated', 'block_exacsvenrol', $counter);
+                    }
+                    echo "<script>alert('$msg')</script>";
+                }
+                if($enrollCounter > 0){
+                    if($enrollCounter > 1){
+                        $msg = get_string('enrolledUsers', 'block_exacsvenrol', $enrollCounter);
+                    } else {
+                        $msg = get_string('enrolledUser', 'block_exacsvenrol', $enrollCounter);
+                    }
+                    echo "<script>alert('$msg')</script>";
+                }
+                if($errorCounter > 0){
+                    $msg = getErrorUserList($userList);
+                    echo "<script>alert('$msg')</script>";
+                }
             }
         }
     } else {
-        echo "<br/> Couldn't find the file!";
+        echo get_string('filenotreadable', 'block_exacsvenrol');
     }
 }
 
@@ -103,7 +137,7 @@ function enrolUser($userid, $role, $courseid)
     } elseif ($role == "frontpage") {
         $roleid = 8;
     } else {
-        throw new Exception("There isn't a role called: " . $role);
+        throw new Exception(get_string("roleException","block_exacsvenrol", $role));
     }
 
     if ($manualinstance != null) {
@@ -111,15 +145,38 @@ function enrolUser($userid, $role, $courseid)
     }
 }
 
-?>
-<form method="post" enctype="multipart/form-data">
-    <label>Please select your CSV-File (*.csv)!
+function getErrorUserList($users){
+    $msg = "";
+    $counter = 0;
+    $userList = "";
+    foreach ($users as $u){
+        if(next($users)){
+            $userList .= $u . ", ";
+        } else {
+            $userList .= "and " . $u;
+        }
+        $counter++;
+    }
+
+    if($counter > 1){
+        $msg = get_string('moreUsersExists', 'block_exacsvenrol', $userList);
+    } else {
+        $msg = get_string('userExists', 'block_exacsvenrol', $userList);
+    }
+
+    return $msg;
+}
+
+    echo "<form method='post' enctype='multipart/form-data'>
+    ". get_string('csvhint', 'block_exacsvenrol') ."
     </label>
     <br/>
-    <input name="file" type="file" accept="text/csv">
+    <input name='file' type='file' accept='text/csv'>
     <br/><br/>
-    <input type="submit" value="Upload CSV!">
-</form>
+    <input type='submit' value='". get_string('uploadButton', 'block_exacsvenrol')."'>
+</form>"
+?>
+
 
 <?php
     echo $OUTPUT->footer();
