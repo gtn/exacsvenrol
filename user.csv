@@ -1,3 +1,3 @@
-testa,testaa,testanachname,testa@gtn-solutions.com,Student,Kekse,
-testb,testbb,testbnachname,testb@gtn-solutions.com,Student,Kekse,
-testc,testcc,testcnachname,testc@gtn-solutions.com,Student,Kekse,
+username,firstname,lastname,email,role,courseid,courseshort,
+usera,firsta,lasta,emaila@gtn-solutions.com,Student,2,Kekse,
+userb,firstb,lastb,emailb@gtn-solutions.com,Student,2,Kekse,
