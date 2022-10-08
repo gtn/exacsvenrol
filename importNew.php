@@ -20,7 +20,7 @@ require_once('../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
 $PAGE->set_context(context_system::instance());
-$PAGE->set_url(new moodle_url('/blocks/exacsvenrol/import.php'));
+$PAGE->set_url(new moodle_url('/blocks/exacsvenrol/importNew.php'));
 $PAGE->set_title(get_string("pluginname", "block_exacsvenrol"));
 $PAGE->set_heading(get_string("pluginname", "block_exacsvenrol"));
 $PAGE->set_pagelayout('mydashboard');
@@ -37,25 +37,24 @@ function readCSV()
     try {
         move_uploaded_file($_FILES['file']['tmp_name'], $CFG->fileroot . "\\blocks\\exacsvenrol\\files\\" . $_FILES['file']['name']);
     } finally {
-        $myfile = fopen($CFG->fileroot . "\\blocks\\exacsvenrol\\files\\" . $_FILES['file']['name'], "r");
-        $value = fread($myfile, filesize($CFG->fileroot . "\\blocks\\exacsvenrol\\files\\" . $_FILES['file']['name']));
-        unlink($CFG->fileroot . "\\blocks\\exacsvenrol\\files\\" . $_FILES['file']['name']);
-        fclose($myfile);
+        $csv = array_map("str_getcsv", file($CFG->fileroot . "\\blocks\\exacsvenrol\\files\\" . $_FILES['file']['name']));
+        $keys  = array_shift($csv);
 
-        $info = explode("\n", $value);
-        $firstElement = array_shift($info);
+        foreach ($csv as $i=>$row) {
+            $csv[$i] = array_combine($keys, $row);
+        }
 
-        foreach (explode(",", $firstElement) as $head) {
-            if (strtolower($head) == "email" || strtolower($head) == "e-mail") {
-                createUser($info);
+        foreach ($keys as $key) {
+            if (strtolower($key) == "email" || strtolower($key) == "e-mail") {
+                createUser($csv);
             }
 
-            if (strtolower($head) == "courseid") {
-                enrolType($info, "id");
+            if (strtolower($key) == "courseid") {
+                enrolType($csv, "id");
                 break;
 
-            } elseif (strtolower($head) == "courseshort") {
-                enrolType($info, "shortname");
+            } elseif (strtolower($key) == "courseshort") {
+                enrolType($csv, "shortname");
                 break;
             }
         }
@@ -71,18 +70,17 @@ function createUser($value)
         $userList = array();
 
         foreach (array_filter($value) as $u) {
-            $u = explode(",", $u);
-            if (($DB->get_record('user', ['username' => $u[0]])) == null) {
-                $user = create_user_record($u[0], "sicheresPasswort123!");
-                $user->firstname = $u[1];
-                $user->lastname = $u[2];
-                $user->email = $u[3];
+            if (($DB->get_record('user', ['username' => $u["username"]])) == null) {
+                $user = create_user_record($u["username"], "sicheresPasswort123!");
+                $user->firstname = $u["firstname"];
+                $user->lastname = $u["lastname"];
+                $user->email = $u["email"];
 
                 $DB->update_record('user', $user);
 
                 $counter++;
             } else {
-                $userList[] = $u[0];
+                $userList[] = $u["username"];
                 $errorCounter++;
             }
         }
@@ -110,18 +108,17 @@ function enrolType($value, $type)
     global $DB;
     $enrolCounter = 0;
     foreach (array_filter($value) as $elem) {
-        $e = explode(",", $elem);
         if ($type == "id") {
-            $course = $DB->get_record('course', ['id' => intval($e[5])]);
+            $course = $DB->get_record('course', ['id' => intval($elem["courseid"])]);
         } else {
-            $course = $DB->get_record('course', ['shortname' => $e[6]]);
+            $course = $DB->get_record('course', ['shortname' => $elem["courseshort"]]);
         }
 
         $context = context_course::instance($course->id);
-        $user = $DB->get_record('user', ['username' => $e[0]]);
+        $user = $DB->get_record('user', ['username' => $elem["username"]]);
 
         if (!is_enrolled($context, $user)) {
-            enrolUser($user->id, strtolower($e[4]), $course->id);
+            enrolUser($user->id, strtolower($elem["role"]), $course->id);
             $enrolCounter++;
         }
     }
@@ -187,6 +184,7 @@ function getErrorUserList($users)
     return $msg;
 }
 
+
 echo "<form method='post' enctype='multipart/form-data'>
     " . get_string('csvhint', 'block_exacsvenrol') . "
     </label>
@@ -201,3 +199,4 @@ echo "<form method='post' enctype='multipart/form-data'>
 <?php
 echo $OUTPUT->footer();
 ?>
+

@@ -17,7 +17,8 @@ class block_exacsvenrol extends block_base
         $content = '';
 
         $icon = '<img src="' . $CFG->wwwroot . '/blocks/exacsvenrol/icons/user-solid.svg' . '" class="icon" alt="" />';
-        $content .= $icon . '<a href="' . $CFG->wwwroot . '/blocks/exacsvenrol/import.php">Upload Users</a>';
+        $content .= $icon . '<a href="' . $CFG->wwwroot . '/blocks/exacsvenrol/import.php">Upload Users</a><br/>';
+        $content .= $icon . '<a href="' . $CFG->wwwroot . '/blocks/exacsvenrol/importNew.php">Upload Users (New)</a>';
 
         $this->content = new stdClass();
         $this->content->text = $content;
