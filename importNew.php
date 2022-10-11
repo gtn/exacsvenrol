@@ -28,7 +28,10 @@ $PAGE->set_pagelayout('mydashboard');
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     readCSV();
 }
-
+require_login();
+if (!is_siteadmin()){
+	print_error('Sie besitzen nicht die Rechte um dieses Feature zu verwenden.', 'block_exacsvenrol');
+}
 echo $OUTPUT->header();
 
 function readCSV()
@@ -183,8 +186,9 @@ function getErrorUserList($users)
 
     return $msg;
 }
+?>
 
-
+<?php
 echo "<form method='post' enctype='multipart/form-data'>
     " . get_string('csvhint', 'block_exacsvenrol') . "
     </label>
@@ -192,7 +196,32 @@ echo "<form method='post' enctype='multipart/form-data'>
     <input name='file' type='file' accept='text/csv'>
     <br/><br/>
     <input type='submit' value='" . get_string('uploadButton', 'block_exacsvenrol') . "'>
-</form>"
+</form><br>";
+
+echo '<p>
+<b>Hinweise:</b><br>
+<i>Laden sie eine csv Datei hoch, um Benutzer in Kurse einzuschreiben und bei Bedarf neu im System anzulegen.<br>
+Beispiele für gültige Formate der csv Datei:</i><br><br>
+<b>Benutzer anlegen und in Kurs einschreiben:</b><br>
+"username","firstname","lastname","email","role","courseid"<br>
+"maxmuster","Max","Mustermann","mm@example.com","Student","1"<br>
+"maximuster","Maxi","Mustermanni","mmi@example.com","Student","1"<br>
+<br>
+<b>Benutzer anlegen und in Kurs einschreiben:</b><br>
+username,firstname,lastname,email,role,courseshort<br>
+maxmuster,Max,Mustermann,mm@example.com,Student,1<br>
+maximuster,Maxi,Mustermanni,mmi@example.com,Student,1<br>
+<br>
+<b>Benutzer ain Kurs einschreiben:</b><br>
+username,courseid<br>
+maxmuster,1<br>
+maximuster,1<br>
+<br>
+<b>Benutzer ain Kurs einschreiben:</b><br>
+"username","courseshort"<br>
+"maxmuster","Kurs 12"<br>
+"maximuster","Kurs 12"<br>
+</p>';
 ?>
 
 
