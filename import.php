@@ -35,11 +35,11 @@ function readCSV()
 {
     global $CFG;
     try {
-        move_uploaded_file($_FILES['file']['tmp_name'], $CFG->fileroot . "\\blocks\\exacsvenrol\\files\\" . $_FILES['file']['name']);
+        move_uploaded_file($_FILES['file']['tmp_name'], $CFG->dataroot . "\\temp\\" . $_FILES['file']['name']);
     } finally {
-        $myfile = fopen($CFG->fileroot . "\\blocks\\exacsvenrol\\files\\" . $_FILES['file']['name'], "r");
-        $value = fread($myfile, filesize($CFG->fileroot . "\\blocks\\exacsvenrol\\files\\" . $_FILES['file']['name']));
-        unlink($CFG->fileroot . "\\blocks\\exacsvenrol\\files\\" . $_FILES['file']['name']);
+        $myfile = fopen($CFG->dataroot . "\\temp\\" . $_FILES['file']['name'], "r");
+        $value = fread($myfile, filesize($CFG->dataroot . "\\temp\\" . $_FILES['file']['name']));
+        unlink($CFG->dataroot . "\\temp\\" . $_FILES['file']['name']);
         fclose($myfile);
 
         $info = explode("\n", $value);
