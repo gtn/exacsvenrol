@@ -1,8 +1,8 @@
 <?php
 $string['filenotreadable'] = 'Datei konnte nicht geöffnet werden.';
 $string['csvhint'] = 'Bitte öffnen Sie ihre CSV-File (*.csv)!';
-$string['pluginname'] = 'CSV Einschreibungs Tool';
-$string['exacsvenrol'] = 'CSV Einschreibungs Tool';
+$string['pluginname'] = 'Kurseinschreibung mittels csv Import';
+$string['exacsvenrol'] = 'Csv-Kurseinschreibung';
 $string['exacsvenrol:addinstance'] = 'Füge einen neuen Exacsvenrol-Block hinzu!';
 $string['exacsvenrol:myaddinstance'] = 'Füge einen neuen Exacsvenrol-Block zu meiner Moodle Seite hinzu!';
 $string['uploadButton'] = 'CSV hochladen!';
