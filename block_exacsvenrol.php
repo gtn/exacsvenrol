@@ -9,7 +9,7 @@ class block_exacsvenrol extends block_base
 
     public function get_content()
     {
-        global $CFG;
+        global $CFG,$COURSE;
 
         if ($this->content !== null) {
             return $this->content;
@@ -17,8 +17,7 @@ class block_exacsvenrol extends block_base
         $content = '';
 		if (is_siteadmin()){
 			$icon = '<img src="' . $CFG->wwwroot . '/blocks/exacsvenrol/icons/user-solid.svg' . '" class="icon" alt="" />';
-			$content .= $icon . '<a href="' . $CFG->wwwroot . '/blocks/exacsvenrol/import.php">Upload Users</a><br/>';
-			$content .= $icon . '<a href="' . $CFG->wwwroot . '/blocks/exacsvenrol/importNew.php">Upload Users (New)</a>';
+			$content .= $icon . '<a href="' . $CFG->wwwroot . '/blocks/exacsvenrol/importNew.php">Benutzer Einschreiben</a>';
 		}
         $this->content = new stdClass();
         $this->content->text = $content;
