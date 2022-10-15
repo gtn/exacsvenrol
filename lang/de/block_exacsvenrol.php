@@ -11,5 +11,6 @@ $string['usersCreated'] = 'Es wurden {$a} User erfolgreich erstellt!';
 $string['userCreated'] = 'Es wurde {$a} User erfolgreich erstellt!';
 $string['enrolledUser'] = 'Es wurde {$a} User erfolgreich eingeschrieben!';
 $string['enrolledUsers'] = 'Es wurden {$a} User erfolgreich eingeschrieben!';
+$string['noEnrolment'] = 'Niemand wurde eingeschrieben!';
 $string['userExists'] = 'Der User {$a} existiert bereits!';
 $string['moreUsersExists'] = 'Die User {$a} existieren bereits!';

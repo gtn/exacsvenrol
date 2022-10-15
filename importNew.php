@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 require_login();
 if (!is_siteadmin()){
-	print_error('Sie besitzen nicht die Rechte um dieses Feature zu verwenden.', 'block_exacsvenrol');
+    print_error('Sie besitzen nicht die Rechte um dieses Feature zu verwenden.', 'block_exacsvenrol');
 }
 echo $OUTPUT->header();
 
@@ -112,7 +112,7 @@ function enrolType($value, $type)
     $enrolCounter = 0;
     foreach (array_filter($value) as $elem) {
         if ($type == "id") {
-            $course = $DB->get_record('course', ['id' => intval($elem["courseid"])]);
+            $course = $DB->get_record('course', ['id' => $elem["courseid"]]);
         } else {
             $course = $DB->get_record('course', ['shortname' => $elem["courseshort"]]);
         }
@@ -120,8 +120,12 @@ function enrolType($value, $type)
         $context = context_course::instance($course->id);
         $user = $DB->get_record('user', ['username' => $elem["username"]]);
 
-        if (!is_enrolled($context, $user)) {
-            enrolUser($user->id, strtolower($elem["role"]), $course->id);
+        if(!is_enrolled($context, $user)) {
+            if (array_key_exists("role", $elem)) {
+                enrolUser($user->id, strtolower($elem["role"]), $course->id);
+            } else {
+                enrolUser($user->id, "student", $course->id);
+            }
             $enrolCounter++;
         }
     }
@@ -132,8 +136,10 @@ function enrolType($value, $type)
         } else {
             $msg = get_string('enrolledUser', 'block_exacsvenrol', $enrolCounter);
         }
-        echo "<script>alert('$msg')</script>";
+    } else {
+        $msg = get_string('noEnrolment', 'block_exacsvenrol');
     }
+    echo "<script>alert('$msg')</script>";
 }
 
 function enrolUser($userid, $role, $courseid)
@@ -154,7 +160,8 @@ function enrolUser($userid, $role, $courseid)
     try{
         $t = $DB->get_record('role', ['shortname' => strtolower($role)]);
     } catch (Exception $e) {
-        throw new Exception(get_string("roleException", "block_exacsvenrol", $role));
+        $msg = $e->getMessage();
+        echo "<script>alert('$msg')</script>";
     }
 
     if ($manualinstance != null) {
@@ -224,8 +231,6 @@ maximuster,1<br>
 </p>';
 ?>
 
-
 <?php
 echo $OUTPUT->footer();
 ?>
-
