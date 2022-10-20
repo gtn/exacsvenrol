@@ -38,9 +38,11 @@ function readCSV()
 {
     global $CFG;
     try {
-        move_uploaded_file($_FILES['file']['tmp_name'], $CFG->dataroot . "\\temp\\" . $_FILES['file']['name']);
+        //move_uploaded_file($_FILES['file']['tmp_name'], $CFG->dataroot . "\\temp\\" . $_FILES['file']['name']);
+		move_uploaded_file($_FILES['file']['tmp_name'], $CFG->tempdir . "/".$_FILES['file']['name']);
     } finally {
-        $csv = array_map("str_getcsv", file($CFG->dataroot . "\\temp\\" . $_FILES['file']['name']));
+        //$csv = array_map("str_getcsv", file($CFG->dataroot . "\\temp\\" . $_FILES['file']['name']));
+		$csv = array_map("str_getcsv", file($CFG->tempdir . "/".$_FILES['file']['name']));
         $keys  = array_shift($csv);
 
         foreach ($csv as $i=>$row) {
