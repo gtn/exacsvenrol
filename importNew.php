@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     readCSV();
 }
 require_login();
-if (!is_siteadmin()){
+if (!is_siteadmin()) {
     print_error('Sie besitzen nicht die Rechte um dieses Feature zu verwenden.', 'block_exacsvenrol');
 }
 echo $OUTPUT->header();
@@ -39,29 +39,24 @@ function readCSV()
     global $CFG;
     try {
         //move_uploaded_file($_FILES['file']['tmp_name'], $CFG->dataroot . "\\temp\\" . $_FILES['file']['name']);
-		move_uploaded_file($_FILES['file']['tmp_name'], $CFG->tempdir . "/".$_FILES['file']['name']);
+        move_uploaded_file($_FILES['file']['tmp_name'], $CFG->tempdir . "/" . $_FILES['file']['name']);
     } finally {
         //$csv = array_map("str_getcsv", file($CFG->dataroot . "\\temp\\" . $_FILES['file']['name']));
-		$csv = array_map("str_getcsv", file($CFG->tempdir . "/".$_FILES['file']['name']));
-        $keys  = array_shift($csv);
+        $csv = array_map("str_getcsv", file($CFG->tempdir . "/" . $_FILES['file']['name']));
+        $keys = array_shift($csv);
 
-        foreach ($csv as $i=>$row) {
+        foreach ($csv as $i => $row) {
             $csv[$i] = array_combine($keys, $row);
         }
 
-        foreach ($keys as $key) {
-            if (strtolower($key) == "email" || strtolower($key) == "e-mail") {
-                createUser($csv);
-            }
-
-            if (strtolower($key) == "courseid") {
-                enrolType($csv, "id");
-                break;
-
-            } elseif (strtolower($key) == "courseshort") {
-                enrolType($csv, "shortname");
-                break;
-            }
+        if (array_key_exists("email", $csv[0]) && array_key_exists("username", $csv[0])) {
+            createUser($csv);
+        } elseif (array_key_exists("courseid", $csv[0])) {
+            enrolType($csv, "id");
+        } elseif (array_key_exists("courseshort", $csv[0])) {
+            enrolType($csv, "shortname");
+        } else {
+            echo "<script>alert('csv error')</script>";
         }
     }
 }
@@ -120,9 +115,14 @@ function enrolType($value, $type)
         }
 
         $context = context_course::instance($course->id);
-        $user = $DB->get_record('user', ['username' => $elem["username"]]);
 
-        if(!is_enrolled($context, $user)) {
+        if (array_key_exists("username", $elem)) {
+            $user = $DB->get_record('user', ['username' => $elem["username"]]);
+        } else {
+            $user = $DB->get_record('user', ['email' => $elem["email"]]);
+        }
+
+        if (!is_enrolled($context, $user)) {
             if (array_key_exists("role", $elem)) {
                 enrolUser($user->id, strtolower($elem["role"]), $course->id);
             } else {
@@ -159,7 +159,7 @@ function enrolUser($userid, $role, $courseid)
         }
     }
 
-    try{
+    try {
         $t = $DB->get_record('role', ['shortname' => strtolower($role)]);
     } catch (Exception $e) {
         $msg = $e->getMessage();
@@ -195,6 +195,7 @@ function getErrorUserList($users)
 
     return $msg;
 }
+
 ?>
 
 <?php
