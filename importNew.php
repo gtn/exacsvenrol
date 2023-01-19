@@ -222,15 +222,21 @@ username,firstname,lastname,email,role,courseshort<br>
 maxmuster,Max,Mustermann,mm@example.com,Student,1<br>
 maximuster,Maxi,Mustermanni,mmi@example.com,Student,1<br>
 <br>
-<b>Benutzer ain Kurs einschreiben:</b><br>
+<b>Benutzer in Kurs einschreiben:</b><br>
 username,courseid<br>
 maxmuster,1<br>
 maximuster,1<br>
 <br>
-<b>Benutzer ain Kurs einschreiben:</b><br>
+<b>Benutzer in Kurs einschreiben - Username:</b><br>
 "username","courseshort"<br>
 "maxmuster","Kurs 12"<br>
 "maximuster","Kurs 12"<br>
+
+<b>Benutzer in Kurs einschreiben mit E-Mail Adresse:</b><br>
+"email","courseshort"
+"sus01@gtn.at","Kurs 12"
+"sus02@gtn.at","Kurs 12"
+
 </p>';
 ?>
 
